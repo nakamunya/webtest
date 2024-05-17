@@ -40,9 +40,20 @@
             border-radius: 5px;
             display: flex;
             align-items: center;
+            flex-direction: column; /* ボタンをテキストの下に配置 */
         }
         .hdr-status input {
-            margin-right: 10px;
+            margin-bottom: 10px; /* トグルとボタンの間のスペース */
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+        }
+        .nav-buttons button {
+            margin: 0 5px;
+            padding: 5px 10px; /* ボタンのサイズを小さく */
+            font-size: 12px; /* フォントサイズを小さく */
+            cursor: pointer;
         }
     </style>
 </head>
@@ -52,6 +63,14 @@
     </div>
 
     <script>
+        const imageSets = [
+            { mov: 'image-set/20210523-A6X06569-hdr.mov', avif: 'image-set/20210523-A6X06569-hdr.avif', jpg: 'image-set/20210523-A6X06569-sdr.jpg' },
+            { mov: 'image-set/20230722-A7_03428.mov', avif: 'image-set/20230722-A7_03428.avif', jpg: 'image-set/20230722-A7_03428.jpg' },
+            // さらに画像セットを追加
+        ];
+
+        let currentIndex = 0;
+
         function isSafari() {
             var ua = navigator.userAgent.toLowerCase();
             return ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1;
@@ -80,14 +99,15 @@
             const content = document.getElementById('content');
             content.innerHTML = '';
 
+            const set = imageSets[currentIndex];
             if (isHDR) {
                 if (isSafariBrowser) {
-                    content.appendChild(createVideoElement('20210523-A6X06569-hdr.mov'));
+                    content.appendChild(createVideoElement(set.mov));
                 } else {
-                    content.appendChild(createImageElement('20210523-A6X06569-hdr.avif', 'HDR Image'));
+                    content.appendChild(createImageElement(set.avif, 'HDR Image'));
                 }
             } else {
-                content.appendChild(createImageElement('20210523-A6X06569-sdr.jpg', 'SDR Image'));
+                content.appendChild(createImageElement(set.jpg, 'SDR Image'));
             }
         }
 
@@ -97,7 +117,7 @@
             const isHDR = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
 
             if (isHDR) {
-                hdrStatus.innerHTML = '<label><input type="checkbox" id="hdrToggle">HDR Display Supported</label>';
+                hdrStatus.innerHTML = '<label><input type="checkbox" id="hdrToggle">HDR Display Supported</label><div class="nav-buttons"><button onclick="prevImage()">Previous</button><button onclick="nextImage()">Next</button></div>';
                 displayContent(true, isSafariBrowser);
 
                 const hdrToggle = document.getElementById('hdrToggle');
@@ -109,6 +129,20 @@
                 hdrStatus.textContent = 'HDR Display Not Supported';
                 displayContent(false, isSafariBrowser);
             }
+        }
+
+        function prevImage() {
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : imageSets.length - 1;
+            const isSafariBrowser = isSafari();
+            const isHDR = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
+            displayContent(isHDR, isSafariBrowser);
+        }
+
+        function nextImage() {
+            currentIndex = (currentIndex < imageSets.length - 1) ? currentIndex + 1 : 0;
+            const isSafariBrowser = isSafari();
+            const isHDR = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
+            displayContent(isHDR, isSafariBrowser);
         }
 
         window.onload = function() {
