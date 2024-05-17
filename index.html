@@ -61,7 +61,14 @@
     <div class="container" id="content">
         <!-- 動画または画像がここに挿入されます -->
     </div>
-
+    <div class="hdr-status" id="hdrStatus">
+        <div id="hdrText"></div>
+        <div class="nav-buttons">
+            <button onclick="prevImage()">Previous</button>
+            <button onclick="nextImage()">Next</button>
+        </div>
+    </div>
+    
     <script>
         const imageSets = [
             { mov: 'image-set/20210523-A6X06569-hdr.mov', avif: 'image-set/20210523-A6X06569-hdr.avif', jpg: 'image-set/20210523-A6X06569-sdr.jpg' },
@@ -112,12 +119,12 @@
         }
 
         function checkHDRSupport() {
-            const hdrStatus = document.getElementById('hdrStatus');
+            const hdrText = document.getElementById('hdrText');
             const isSafariBrowser = isSafari();
             const isHDR = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
 
             if (isHDR) {
-                hdrStatus.innerHTML = '<label><input type="checkbox" id="hdrToggle">HDR Display Supported</label><div class="nav-buttons"><button onclick="prevImage()">Previous</button><button onclick="nextImage()">Next</button></div>';
+                hdrText.innerHTML = '<label><input type="checkbox" id="hdrToggle">HDR Display Supported</label>';
                 displayContent(true, isSafariBrowser);
 
                 const hdrToggle = document.getElementById('hdrToggle');
@@ -126,7 +133,7 @@
                     displayContent(hdrToggle.checked, isSafariBrowser);
                 });
             } else {
-                hdrStatus.textContent = 'HDR Display Not Supported';
+                hdrText.innerHTML = '<label>HDR Display Not Supported</label>';
                 displayContent(false, isSafariBrowser);
             }
         }
@@ -146,10 +153,6 @@
         }
 
         window.onload = function() {
-            var container = document.createElement('div');
-            container.id = 'hdrStatus';
-            container.className = 'hdr-status';
-            document.body.appendChild(container);
             checkHDRSupport();
         }
     </script>
