@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HDR Photo Display</title>
+    <title>HDR Display</title>
     <style>
         body, html {
             margin: 0;
@@ -16,14 +16,14 @@
             background-color: #000;
         }
         .container {
-            position: relative;
             width: 100%;
             height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
-        img {
+        img, video {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
@@ -47,34 +47,77 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <img id="hdrImage" src="20210523-A6X06569-hdr.avif" alt="HDR Image">
-        <div id="hdrStatus" class="hdr-status"></div>
+    <div class="container" id="content">
+        <!-- 動画または画像がここに挿入されます -->
     </div>
 
     <script>
+        function isSafari() {
+            var ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1;
+        }
+
+        function createVideoElement(src) {
+            var video = document.createElement('video');
+            video.setAttribute('muted', '');
+            video.setAttribute('autoplay', '');
+            video.setAttribute('playsinline', '');
+            var source = document.createElement('source');
+            source.setAttribute('src', src);
+            source.setAttribute('type', 'video/quicktime');
+            video.appendChild(source);
+            return video;
+        }
+
+        function createImageElement(src, alt) {
+            var img = document.createElement('img');
+            img.setAttribute('src', src);
+            img.setAttribute('alt', alt);
+            return img;
+        }
+
+        function displayContent(isHDR, isSafariBrowser) {
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+
+            if (isHDR) {
+                if (isSafariBrowser) {
+                    content.appendChild(createVideoElement('20210523-A6X06569-hdr.mov'));
+                } else {
+                    content.appendChild(createImageElement('20210523-A6X06569-hdr.avif', 'HDR Image'));
+                }
+            } else {
+                content.appendChild(createImageElement('20210523-A6X06569-sdr.jpg', 'SDR Image'));
+            }
+        }
+
         function checkHDRSupport() {
             const hdrStatus = document.getElementById('hdrStatus');
-            const img = document.getElementById('hdrImage');
-            if (window.matchMedia && window.matchMedia('(dynamic-range: high)').matches) {
+            const isSafariBrowser = isSafari();
+            const isHDR = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
+
+            if (isHDR) {
                 hdrStatus.innerHTML = '<label><input type="checkbox" id="hdrToggle">HDR Display Supported</label>';
-                img.src = '20210523-A6X06569-hdr.avif';
+                displayContent(true, isSafariBrowser);
 
                 const hdrToggle = document.getElementById('hdrToggle');
                 hdrToggle.checked = true;
                 hdrToggle.addEventListener('change', function() {
-                    if (hdrToggle.checked) {
-                        img.src = '20210523-A6X06569-hdr.avif';
-                    } else {
-                        img.src = '20210523-A6X06569-hdr.jpg'; // Fallback to SDR image
-                    }
+                    displayContent(hdrToggle.checked, isSafariBrowser);
                 });
             } else {
                 hdrStatus.textContent = 'HDR Display Not Supported';
-                img.src = '20210523-A6X06569-sdr.jpg'; // Fallback to SDR image
+                displayContent(false, isSafariBrowser);
             }
         }
-        window.onload = checkHDRSupport;
+
+        window.onload = function() {
+            var container = document.createElement('div');
+            container.id = 'hdrStatus';
+            container.className = 'hdr-status';
+            document.body.appendChild(container);
+            checkHDRSupport();
+        }
     </script>
 </body>
 </html>
