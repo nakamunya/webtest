@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HDR Photo Display</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .hdr-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .hdr-status input {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="hdrImage" src="20210523-A6X06569-hdr.avif" alt="HDR Image">
+        <div id="hdrStatus" class="hdr-status"></div>
+    </div>
+
+    <script>
+        function checkHDRSupport() {
+            const hdrStatus = document.getElementById('hdrStatus');
+            const img = document.getElementById('hdrImage');
+            if (window.matchMedia && window.matchMedia('(dynamic-range: high)').matches) {
+                hdrStatus.innerHTML = '<label><input type="checkbox" id="hdrToggle">HDR Display Supported</label>';
+                img.src = '20210523-A6X06569-hdr.avif';
+
+                const hdrToggle = document.getElementById('hdrToggle');
+                hdrToggle.checked = true;
+                hdrToggle.addEventListener('change', function() {
+                    if (hdrToggle.checked) {
+                        img.src = '20210523-A6X06569-hdr.avif';
+                    } else {
+                        img.src = '20210523-A6X06569-hdr.jpg'; // Fallback to SDR image
+                    }
+                });
+            } else {
+                hdrStatus.textContent = 'HDR Display Not Supported';
+                img.src = '20210523-A6X06569-sdr.jpg'; // Fallback to SDR image
+            }
+        }
+        window.onload = checkHDRSupport;
+    </script>
+</body>
+</html>
