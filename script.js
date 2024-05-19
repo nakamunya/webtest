@@ -4,8 +4,6 @@ const imageSets = [
     // さらに画像セットを追加
 ];
 
-let currentIndex = 0;
-
 function isSafari() {
     var ua = navigator.userAgent.toLowerCase();
     return ua.indexOf('safari') !== -1 && ua.indexOf('chrome') === -1;
