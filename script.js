@@ -34,16 +34,22 @@ function displayContent(isHDR, isSafariBrowser) {
     const content = document.getElementById('content');
     content.innerHTML = '';
 
-    const set = imageSets[currentIndex];
-    if (isHDR) {
-        if (isSafariBrowser) {
-            content.appendChild(createVideoElement(set.mov));
+    imageSets.forEach((set, index) => {
+        const slide = document.createElement('div');
+        slide.classList.add('swiper-slide');
+
+        if (isHDR) {
+            if (isSafariBrowser) {
+                slide.appendChild(createVideoElement(set.mov));
+            } else {
+                slide.appendChild(createImageElement(set.avif, 'HDR Image'));
+            }
         } else {
-            content.appendChild(createImageElement(set.avif, 'HDR Image'));
+            slide.appendChild(createImageElement(set.jpg, 'SDR Image'));
         }
-    } else {
-        content.appendChild(createImageElement(set.jpg, 'SDR Image'));
-    }
+
+        content.appendChild(slide);
+    });
 }
 
 function checkHDRSupport() {
@@ -59,27 +65,27 @@ function checkHDRSupport() {
         hdrToggle.checked = true;
         hdrToggle.addEventListener('change', function() {
             displayContent(hdrToggle.checked, isSafariBrowser);
+            initializeSwiper(); // Swiperの初期化
         });
     } else {
         hdrText.innerHTML = '<label>HDR Display Not Supported</label>';
         displayContent(false, isSafariBrowser);
+        initializeSwiper(); // Swiperの初期化
     }
 }
 
-function prevImage() {
-    currentIndex = (currentIndex > 0) ? currentIndex - 1 : imageSets.length - 1;
-    const isSafariBrowser = isSafari();
-    const isHDR = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
-    displayContent(isHDR, isSafariBrowser);
-}
-
-function nextImage() {
-    currentIndex = (currentIndex < imageSets.length - 1) ? currentIndex + 1 : 0;
-    const isSafariBrowser = isSafari();
-    const isHDR = window.matchMedia && window.matchMedia('(dynamic-range: high)').matches;
-    displayContent(isHDR, isSafariBrowser);
+function initializeSwiper() {
+    new Swiper('.swiper-container', {
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        effect: 'slide',
+        simulateTouch: true,
+    });
 }
 
 window.onload = function() {
     checkHDRSupport();
+    initializeSwiper(); // Swiperの初期化
 }
